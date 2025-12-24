@@ -214,7 +214,7 @@ const MobileFilterSidebar: React.FC<MobileFilterSidebarProps> = ({
           <Text strong>Filters</Text>
         </Space>
         <Space>
-          <Button icon={<ReloadOutlined spin={isRefreshingResources} />} onClick={onRefreshResources} disabled={isLoading || isRefreshingResources} size="small">Reload</Button>
+          <Button icon={<ReloadOutlined spin={isRefreshingResources} />} onClick={onRefreshResources} disabled={isLoading || isRefreshingResources} size="small"></Button>
           <Button icon={<ClearOutlined />} onClick={handleClearAll} disabled={isLoading} size="small">Clear All</Button>
         </Space>
       </div>

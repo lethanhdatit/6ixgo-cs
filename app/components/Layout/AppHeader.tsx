@@ -26,7 +26,7 @@ const AppHeader: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/login');
+    router.push('/6ixgo-cs/login');
   };
 
   const menuItems: MenuProps['items'] = [

@@ -15,8 +15,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && pathname !== '/login') {
-      router.push('/login');
+    if (!isLoading && !isAuthenticated && pathname !== '/6ixgo-cs/login') {
+      router.push('/6ixgo-cs/login');
     }
   }, [isAuthenticated, isLoading, pathname, router]);
 
@@ -35,7 +35,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated && pathname !== '/login') {
+  if (!isAuthenticated && pathname !== '/6ixgo-cs/login') {
     return null;
   }
 

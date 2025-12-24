@@ -266,7 +266,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               disabled={isLoading || isRefreshingResources}
               size="small"
             >
-              Reload
             </Button>
           </Tooltip>
           <Tooltip title="Clear all">
