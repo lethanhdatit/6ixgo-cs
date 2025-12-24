@@ -12,7 +12,7 @@ interface EnvironmentConfig {
 const PRODUCTION_DOMAINS = [
   'admin.6ixgo.com',
   '6ixgo.com',
-  'https://lethanhdatit.github.io/6ixgo-cs'
+  'lethanhdatit.github.io'  // GitHub Pages
 ];
 
 // Check if current environment is production
@@ -26,7 +26,7 @@ export const isProduction = (): boolean => {
   const hostname = window.location.hostname;
   
   // Production if on production domain
-  return PRODUCTION_DOMAINS.some(domain => hostname.includes(domain));
+  return PRODUCTION_DOMAINS.some(domain => hostname.includes(domain) || domain.includes(hostname));
 };
 
 // Staging config (used for localhost, GitHub Pages, staging domain, etc.)

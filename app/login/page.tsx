@@ -54,8 +54,8 @@ const LoginPage: React.FC = () => {
             autoComplete="off"
             layout="vertical"
             initialValues={{
-              email: 'superadmin@mail.com',
-              password: 'vL]x7p66',
+              email: '',
+              password: '',
               rememberMe: true,
             }}
           >
