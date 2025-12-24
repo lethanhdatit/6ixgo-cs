@@ -37,6 +37,12 @@ const AppHeader: React.FC = () => {
     },
   ];
 
+  const handleMenuClick: MenuProps['onClick'] = (info) => {
+    if (info.key !== pathname) {
+      router.push(info.key);
+    }
+  };
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
@@ -65,39 +71,29 @@ const AppHeader: React.FC = () => {
   }
 
   return (
-    <Header
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: '#fff',
-        padding: '0 24px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-      }}
-    >
+    <Header className="app-header">
       {/* Left: Logo and Nav */}
-      <Space size="large">
-        <Text strong style={{ fontSize: 18, color: '#1890ff' }}>
+      <Space size="middle">
+        <Text strong style={{ fontSize: 16, color: '#1890ff', whiteSpace: 'nowrap' }}>
           6ixgo CS
         </Text>
         <Menu
           mode="horizontal"
           selectedKeys={[pathname]}
           items={menuItems}
-          onClick={({ key }) => router.push(key)}
-          style={{ border: 'none' }}
+          onClick={handleMenuClick}
+          style={{ border: 'none', minWidth: 0, background: 'transparent' }}
+          className="desktop-only"
         />
       </Space>
 
       {/* Right: Environment & User */}
-      <Space size="middle">
+      <Space size="small">
         {/* Environment Badge (auto-detected) */}
         <Tag 
           icon={<CloudOutlined />} 
           color={isProd ? 'red' : 'blue'}
+          style={{ margin: 0 }}
         >
           {envName}
         </Tag>
@@ -105,8 +101,8 @@ const AppHeader: React.FC = () => {
         {/* User Menu */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <Space style={{ cursor: 'pointer' }}>
-            <Avatar icon={<UserOutlined />} />
-            <Text>Admin</Text>
+            <Avatar icon={<UserOutlined />} size="small" />
+            <Text className="header-user-name">Admin</Text>
           </Space>
         </Dropdown>
       </Space>

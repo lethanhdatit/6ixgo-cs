@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { resourceService, ApiError } from '../services';
 import { 
   ResourcesData, 
@@ -69,6 +69,45 @@ const flattenLocations = (
   return result;
 };
 
+// Extract Vietnam locations (cities level 2 and districts level 3)
+const extractVietnamLocations = (locations: Location[]): FlatLocation[] => {
+  const result: FlatLocation[] = [];
+  
+  // Find Vietnam (code = 'VNM')
+  const vietnam = locations.find(loc => loc.code === 'VNM');
+  if (!vietnam || !vietnam.children?.length) return result;
+  
+  // Iterate through cities (level 2)
+  for (const city of vietnam.children) {
+    result.push({
+      id: city.id,
+      code: city.code,
+      name: city.name,
+      localizedName: city.localizedName,
+      level: city.level,
+      parentCode: 'VNM',
+      fullPath: city.localizedName,
+    });
+    
+    // Iterate through districts (level 3)
+    if (city.children?.length) {
+      for (const district of city.children) {
+        result.push({
+          id: district.id,
+          code: district.code,
+          name: district.name,
+          localizedName: district.localizedName,
+          level: district.level,
+          parentCode: city.code,
+          fullPath: `${city.localizedName} > ${district.localizedName}`,
+        });
+      }
+    }
+  }
+  
+  return result;
+};
+
 // Extract main categories from the nested structure
 const extractMainCategories = (categories: Category[]): FlatCategory[] => {
   const mainCategories: FlatCategory[] = [];
@@ -131,6 +170,8 @@ const extractSubCategories = (categories: Category[], mainCategoryCode: string):
 };
 
 export const useResources = () => {
+  const queryClient = useQueryClient();
+  
   const query = useQuery<ResourcesData>({
     queryKey: ['resources'],
     queryFn: () => resourceService.getResources(),
@@ -139,6 +180,13 @@ export const useResources = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+
+  // Force refresh resources from API
+  const refreshResources = async () => {
+    resourceService.clearCache();
+    await queryClient.invalidateQueries({ queryKey: ['resources'] });
+    return query.refetch();
+  };
 
   const resources = query.data;
 
@@ -162,8 +210,10 @@ export const useResources = () => {
     ? flattenLocations(resources.locations)
     : [];
 
-  // Get cities only (level 2)
-  const cities = flatLocations.filter(loc => loc.level === 2);
+  // Get Vietnam locations only (cities level 2 and districts level 3)
+  const vnLocations = resources 
+    ? extractVietnamLocations(resources.locations)
+    : [];
 
   const getProductTypes = (mainCategoryCode: string) => {
     if (!resources) return [];
@@ -198,10 +248,11 @@ export const useResources = () => {
     flatCategories,
     languages,
     flatLocations,
-    cities,
+    vnLocations,
     getProductTypes,
     getProcessMethods,
     errorMessage: getErrorMessage(),
+    refreshResources,
   };
 };
 

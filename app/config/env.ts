@@ -12,6 +12,7 @@ interface EnvironmentConfig {
 const PRODUCTION_DOMAINS = [
   'admin.6ixgo.com',
   '6ixgo.com',
+  'https://lethanhdatit.github.io/6ixgo-cs'
 ];
 
 // Check if current environment is production

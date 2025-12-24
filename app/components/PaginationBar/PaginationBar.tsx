@@ -62,20 +62,20 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
-        padding: '16px 0',
+        padding: '12px 0',
         flexWrap: 'wrap',
-        gap: 16
+        gap: 12
       }}
     >
       {/* Records info */}
       <Space>
-        <Text type="secondary">
-          Showing {startRecord} - {endRecord} of {totalRecords} records
+        <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+          {startRecord} - {endRecord} of {totalRecords}
         </Text>
       </Space>
 
       {/* Center pagination controls */}
-      <Space size="small">
+      <Space size={4} wrap>
         {/* First page */}
         <Button
           icon={<DoubleLeftOutlined />}
@@ -102,7 +102,7 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
           onChange={onPageChange}
           showSizeChanger={false}
           showQuickJumper={false}
-          simple={false}
+          simple
           size="small"
           disabled={isLoading}
         />
@@ -127,17 +127,17 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
       </Space>
 
       {/* Right side controls */}
-      <Space size="middle">
+      <Space size="small" wrap>
         {/* Jump to page */}
-        <Space size="small">
-          <Text type="secondary">Go to:</Text>
+        <Space size={4}>
+          <Text type="secondary" style={{ fontSize: 12 }}>Go to:</Text>
           <InputNumber
             min={1}
             max={totalPages}
             value={jumpToPage}
             onChange={(value) => setJumpToPage(value)}
             onKeyDown={handleKeyPress}
-            style={{ width: 70 }}
+            style={{ width: 60 }}
             size="small"
             disabled={isLoading}
           />
@@ -151,13 +151,13 @@ const PaginationBar: React.FC<PaginationBarProps> = ({
         </Space>
 
         {/* Page size selector */}
-        <Space size="small">
-          <Text type="secondary">Per page:</Text>
+        <Space size={4}>
+          <Text type="secondary" style={{ fontSize: 12 }}>Per page:</Text>
           <Select
             value={pageSize}
             onChange={onPageSizeChange}
             size="small"
-            style={{ width: 80 }}
+            style={{ width: 70 }}
             disabled={isLoading}
             options={PAGE_SIZE_OPTIONS.map(size => ({
               value: size,

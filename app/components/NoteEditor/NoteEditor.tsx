@@ -198,7 +198,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
     <Card 
       size="small" 
       style={{ marginTop: 8 }}
-      title={<Text strong>Edit CS Notes</Text>}
+      title={<Text strong>Notes</Text>}
       extra={
         <Button 
           size="small" 

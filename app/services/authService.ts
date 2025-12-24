@@ -1,10 +1,10 @@
-import { identityApi } from './api';
-import { LoginRequest, ApiResponse } from '../types';
+import { identityApi, adminApi } from './api';
+import { LoginRequest, ApiResponse, LoginData } from '../types';
 
 export const authService = {
   // Login
-  login: async (credentials: LoginRequest): Promise<ApiResponse<unknown>> => {
-    const response = await identityApi.post<ApiResponse<unknown>>('/account/signin', {
+  login: async (credentials: LoginRequest): Promise<ApiResponse<LoginData>> => {
+    const response = await identityApi.post<ApiResponse<LoginData>>('/account/signin/admin', {
       data: credentials,
     });
     return response.data;
@@ -21,7 +21,7 @@ export const authService = {
     try {
       // Try to fetch a minimal protected resource
       // If we get 401, the interceptor will handle it
-      await identityApi.get('/account/profile');
+      await adminApi.get('/me');
       return true;
     } catch {
       return false;

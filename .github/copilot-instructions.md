@@ -42,11 +42,12 @@ app/
 ```
 
 ## 2. Authentication & Security
-* **Mechanism:** Cookie-based authentication handled entirely by the backend.
+* **Mechanism:** Backend returns `accessToken` (Bearer). Frontend sends `Authorization: Bearer <accessToken>` on every API call.
+* **Token Storage:** Keep `accessToken` (and refresh token metadata) in `localStorage` under `6ixgo_auth`; also cached in memory for interceptors.
 * **Access Control:**
     * The entire application is private. Login is required to access any route.
-    * **Interceptor Logic:** Global Axios interceptor in `app/services/api.ts`.
-        * **401 Unauthorized:** Redirect to login page immediately.
+    * **Interceptor Logic:** Global Axios interceptor in `app/services/api.ts` adds `Authorization` header when token exists.
+        * **401 Unauthorized:** Should redirect to login (hook can handle future logic).
         * **403 Forbidden:** Log permission denied error.
     * **ProtectedRoute:** Component in `app/components/Layout/ProtectedRoute.tsx` wraps protected pages.
 
@@ -101,7 +102,8 @@ The search screen has a sidebar (`FilterSidebar` component) with the following f
 * `Origin`: **Environment-specific mapping** (set in `config/env.ts`):
     * **STG:** `https://staging-admin.6ixgo.com`
     * **PRD:** `https://admin.6ixgo.com`
-* `withCredentials: true` for cookie auth
+* `Authorization`: `Bearer <accessToken>` (set after successful login)
+* `withCredentials: true` (backend still sets cookies, but primary auth is Bearer token)
 
 ### 4.2. Endpoints (configured in `app/config/env.ts`)
 | Service | STG | PRD |

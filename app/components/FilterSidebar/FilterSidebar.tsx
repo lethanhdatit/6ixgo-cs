@@ -1,41 +1,43 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Card, 
-  Select, 
-  Input, 
-  Button, 
-  Space, 
-  Typography, 
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import {
+  Card,
+  Select,
+  Input,
+  Button,
+  Space,
+  Typography,
   Divider,
   Tooltip,
   Spin
 } from 'antd';
-import { 
-  SearchOutlined, 
-  ClearOutlined, 
+import {
+  SearchOutlined,
+  ClearOutlined,
   FilterOutlined,
-  CloseCircleOutlined 
+  ReloadOutlined
 } from '@ant-design/icons';
 import { useResources, useDebounce } from '../../hooks';
 import { ProductFilterParams } from '../../types';
-import { 
-  NUMBER_OF_PROGRESSES_OPTIONS, 
+import {
+  NUMBER_OF_PROGRESSES_OPTIONS,
   SESSIONS_PER_WEEK_OPTIONS,
-  SEARCH_DEBOUNCE_MS 
+  SEARCH_DEBOUNCE_MS
 } from '../../constants';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface FilterSidebarProps {
   filters: ProductFilterParams;
   onFilterChange: (filters: Partial<ProductFilterParams>) => void;
   onClearAll: () => void;
+  onRefreshResources?: () => Promise<void>;
   isLoading?: boolean;
+  isRefreshingResources?: boolean;
 }
 
-interface MultiSelectState {
+interface PendingState {
   categoryCodes: string[];
   langCodes: string[];
   locationCodes: string[];
@@ -45,32 +47,39 @@ interface MultiSelectState {
   numberOfProgressPerWeeks: number[];
 }
 
+const getInitialPending = (filters: ProductFilterParams): PendingState => ({
+  categoryCodes: filters.categoryCodes || [],
+  langCodes: filters.langCodes || [],
+  locationCodes: filters.locationCodes || [],
+  progressMethodCodes: filters.progressMethodCodes || [],
+  productTypeCodes: filters.productTypeCodes || [],
+  numberOfProgresses: filters.numberOfProgresses || [],
+  numberOfProgressPerWeeks: filters.numberOfProgressPerWeeks || [],
+});
+
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
   filters,
   onFilterChange,
   onClearAll,
+  onRefreshResources,
   isLoading = false,
+  isRefreshingResources = false,
 }) => {
-  const { 
-    mainCategories, 
-    getSubCategories, 
-    languages, 
-    cities,
+  const {
+    mainCategories,
+    getSubCategories,
+    languages,
+    vnLocations,
     getProductTypes,
     getProcessMethods,
-    isLoading: resourcesLoading 
+    isLoading: resourcesLoading
   } = useResources();
 
-  // Local state for multi-select (pending values before applying)
-  const [pendingSelections, setPendingSelections] = useState<MultiSelectState>({
-    categoryCodes: filters.categoryCodes || [],
-    langCodes: filters.langCodes || [],
-    locationCodes: filters.locationCodes || [],
-    progressMethodCodes: filters.progressMethodCodes || [],
-    productTypeCodes: filters.productTypeCodes || [],
-    numberOfProgresses: filters.numberOfProgresses || [],
-    numberOfProgressPerWeeks: filters.numberOfProgressPerWeeks || [],
-  });
+  // Pending state for multi-select filters
+  const [pending, setPending] = useState<PendingState>(() => getInitialPending(filters));
+  
+  // Track if filters changed externally
+  const isInternalUpdate = useRef(false);
 
   // Search term with debounce
   const [searchInput, setSearchInput] = useState(filters.searchTerm || '');
@@ -83,18 +92,22 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     }
   }, [debouncedSearch, filters.searchTerm, onFilterChange]);
 
-  // Sync pending selections with filters when filters change externally
+  // Sync pending with filters only on external changes
   useEffect(() => {
-    setPendingSelections({
-      categoryCodes: filters.categoryCodes || [],
-      langCodes: filters.langCodes || [],
-      locationCodes: filters.locationCodes || [],
-      progressMethodCodes: filters.progressMethodCodes || [],
-      productTypeCodes: filters.productTypeCodes || [],
-      numberOfProgresses: filters.numberOfProgresses || [],
-      numberOfProgressPerWeeks: filters.numberOfProgressPerWeeks || [],
-    });
-  }, [filters]);
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
+    setPending(getInitialPending(filters));
+  }, [
+    filters.categoryCodes,
+    filters.langCodes,
+    filters.locationCodes,
+    filters.progressMethodCodes,
+    filters.productTypeCodes,
+    filters.numberOfProgresses,
+    filters.numberOfProgressPerWeeks,
+  ]);
 
   // Dependent options based on main category
   const subCategories = useMemo(() => {
@@ -112,50 +125,83 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     return getProcessMethods(filters.mainCategoryCode);
   }, [filters.mainCategoryCode, getProcessMethods]);
 
+  // Memoize options
+  const mainCategoryOptions = useMemo(() => 
+    mainCategories.map(cat => ({ value: cat.code, label: cat.localizedName })), 
+    [mainCategories]
+  );
+
+  const subCategoryOptions = useMemo(() =>
+    subCategories.map(cat => ({ value: cat.code, label: cat.localizedName })), 
+    [subCategories]
+  );
+
+  const processMethodOptions = useMemo(() =>
+    processMethods.map(pm => ({ value: pm.code, label: pm.localizedName })), 
+    [processMethods]
+  );
+
+  const productTypeOptions = useMemo(() =>
+    productTypes.map(pt => ({ value: pt.code, label: pt.localizedName })), 
+    [productTypes]
+  );
+
+  const numberOfProgressesOptions = useMemo(() =>
+    NUMBER_OF_PROGRESSES_OPTIONS.map(num => ({ value: num, label: `${num} session${num > 1 ? 's' : ''}` })), 
+    []
+  );
+
+  const sessionsPerWeekOptions = useMemo(() =>
+    SESSIONS_PER_WEEK_OPTIONS.map(num => ({ value: num, label: `${num} per week` })), 
+    []
+  );
+
+  const languageOptions = useMemo(() =>
+    languages.map(lang => ({ value: lang.code, label: lang.localizedName })), 
+    [languages]
+  );
+
+  const locationOptions = useMemo(() =>
+    vnLocations.map(loc => ({ value: loc.code, label: loc.fullPath })), 
+    [vnLocations]
+  );
+
   // Handlers
-  const handleMainCategoryChange = (value: string) => {
-    // Reset dependent filters when main category changes
+  const handleMainCategoryChange = useCallback((value: string) => {
+    isInternalUpdate.current = true;
+    setPending(prev => ({
+      ...prev,
+      categoryCodes: [],
+      progressMethodCodes: [],
+      productTypeCodes: [],
+    }));
     onFilterChange({
       mainCategoryCode: value,
       categoryCodes: undefined,
       progressMethodCodes: undefined,
       productTypeCodes: undefined,
     });
-    setPendingSelections(prev => ({
-      ...prev,
-      categoryCodes: [],
-      progressMethodCodes: [],
-      productTypeCodes: [],
-    }));
-  };
+  }, [onFilterChange]);
 
-  const handlePendingChange = (field: keyof MultiSelectState, values: string[] | number[]) => {
-    setPendingSelections(prev => ({
-      ...prev,
-      [field]: values,
-    }));
-  };
+  const handlePendingChange = useCallback((field: keyof PendingState, values: string[] | number[]) => {
+    setPending(prev => ({ ...prev, [field]: values }));
+  }, []);
 
-  const applyMultiSelect = (field: keyof MultiSelectState) => {
-    const values = pendingSelections[field];
-    onFilterChange({
-      [field]: values.length > 0 ? values : undefined,
-    });
-  };
+  const handleApply = useCallback((field: keyof PendingState) => {
+    isInternalUpdate.current = true;
+    const values = pending[field];
+    onFilterChange({ [field]: values.length > 0 ? values : undefined });
+  }, [pending, onFilterChange]);
 
-  const clearSingleFilter = (field: keyof MultiSelectState) => {
-    setPendingSelections(prev => ({
-      ...prev,
-      [field]: [],
-    }));
-    onFilterChange({
-      [field]: undefined,
-    });
-  };
+  const handleClearField = useCallback((field: keyof PendingState) => {
+    isInternalUpdate.current = true;
+    setPending(prev => ({ ...prev, [field]: [] }));
+    onFilterChange({ [field]: undefined });
+  }, [onFilterChange]);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setSearchInput('');
-    setPendingSelections({
+    setPending({
       categoryCodes: [],
       langCodes: [],
       locationCodes: [],
@@ -165,31 +211,31 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       numberOfProgressPerWeeks: [],
     });
     onClearAll();
-  };
+  }, [onClearAll]);
 
-  // Multi-select dropdown render with Apply button
-  const renderMultiSelectDropdown = (menu: React.ReactElement, field: keyof MultiSelectState) => (
+  // Dropdown render with Apply/Clear buttons inside
+  const renderDropdown = useCallback((menu: React.ReactElement, field: keyof PendingState) => (
     <div>
       {menu}
       <Divider style={{ margin: '8px 0' }} />
       <div style={{ padding: '0 8px 8px', display: 'flex', gap: 8 }}>
-        <Button 
-          type="primary" 
-          size="small" 
+        <Button
+          type="primary"
+          size="small"
           block
-          onClick={() => applyMultiSelect(field)}
+          onClick={() => handleApply(field)}
         >
           Apply
         </Button>
-        <Button 
+        <Button
           size="small"
-          onClick={() => clearSingleFilter(field)}
+          onClick={() => handleClearField(field)}
         >
           Clear
         </Button>
       </div>
     </div>
-  );
+  ), [handleApply, handleClearField]);
 
   if (resourcesLoading) {
     return (
@@ -203,7 +249,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   }
 
   return (
-    <Card 
+    <Card
       className="filter-sidebar"
       title={
         <Space>
@@ -212,18 +258,31 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </Space>
       }
       extra={
-        <Tooltip title="Clear all filters">
-          <Button 
-            icon={<ClearOutlined />} 
-            onClick={handleClearAll}
-            disabled={isLoading}
-          >
-            Clear All
-          </Button>
-        </Tooltip>
+        <Space>
+          <Tooltip title="Reload resources">
+            <Button
+              icon={<ReloadOutlined spin={isRefreshingResources} />}
+              onClick={onRefreshResources}
+              disabled={isLoading || isRefreshingResources}
+              size="small"
+            >
+              Reload
+            </Button>
+          </Tooltip>
+          <Tooltip title="Clear all">
+            <Button
+              icon={<ClearOutlined />}
+              onClick={handleClearAll}
+              disabled={isLoading}
+              size="small"
+            >
+              Clear All
+            </Button>
+          </Tooltip>
+        </Space>
       }
     >
-      <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Search */}
         <div>
           <Text strong>Search</Text>
@@ -233,14 +292,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             allowClear
-            suffix={
-              searchInput && (
-                <CloseCircleOutlined 
-                  onClick={() => setSearchInput('')}
-                  style={{ cursor: 'pointer', color: '#999' }}
-                />
-              )
-            }
           />
         </div>
 
@@ -257,10 +308,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             filterOption={(input, option) =>
               (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
             }
-            options={mainCategories.map(cat => ({
-              value: cat.code,
-              label: cat.localizedName,
-            }))}
+            options={mainCategoryOptions}
           />
         </div>
 
@@ -271,60 +319,15 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             mode="multiple"
             style={{ width: '100%' }}
             placeholder="All"
-            value={pendingSelections.categoryCodes}
+            value={pending.categoryCodes}
             onChange={(values) => handlePendingChange('categoryCodes', values)}
             disabled={!filters.mainCategoryCode}
             showSearch
             filterOption={(input, option) =>
               (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
             }
-            options={subCategories.map(cat => ({
-              value: cat.code,
-              label: cat.localizedName,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'categoryCodes')}
-          />
-        </div>
-
-        {/* Languages */}
-        <div>
-          <Text strong>Languages</Text>
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="All"
-            value={pendingSelections.langCodes}
-            onChange={(values) => handlePendingChange('langCodes', values)}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
-            }
-            options={languages.map(lang => ({
-              value: lang.code,
-              label: lang.localizedName,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'langCodes')}
-          />
-        </div>
-
-        {/* Locations */}
-        <div>
-          <Text strong>Locations</Text>
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="All"
-            value={pendingSelections.locationCodes}
-            onChange={(values) => handlePendingChange('locationCodes', values)}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
-            }
-            options={cities.map(loc => ({
-              value: loc.code,
-              label: loc.fullPath,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'locationCodes')}
+            options={subCategoryOptions}
+            popupRender={(menu) => renderDropdown(menu, 'categoryCodes')}
           />
         </div>
 
@@ -335,18 +338,15 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             mode="multiple"
             style={{ width: '100%' }}
             placeholder="All"
-            value={pendingSelections.progressMethodCodes}
+            value={pending.progressMethodCodes}
             onChange={(values) => handlePendingChange('progressMethodCodes', values)}
             disabled={!filters.mainCategoryCode}
             showSearch
             filterOption={(input, option) =>
               (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
             }
-            options={processMethods.map(pm => ({
-              value: pm.code,
-              label: pm.localizedName,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'progressMethodCodes')}
+            options={processMethodOptions}
+            popupRender={(menu) => renderDropdown(menu, 'progressMethodCodes')}
           />
         </div>
 
@@ -357,18 +357,15 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             mode="multiple"
             style={{ width: '100%' }}
             placeholder="All"
-            value={pendingSelections.productTypeCodes}
+            value={pending.productTypeCodes}
             onChange={(values) => handlePendingChange('productTypeCodes', values)}
             disabled={!filters.mainCategoryCode}
             showSearch
             filterOption={(input, option) =>
               (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
             }
-            options={productTypes.map(pt => ({
-              value: pt.code,
-              label: pt.localizedName,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'productTypeCodes')}
+            options={productTypeOptions}
+            popupRender={(menu) => renderDropdown(menu, 'productTypeCodes')}
           />
         </div>
 
@@ -379,14 +376,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             mode="multiple"
             style={{ width: '100%' }}
             placeholder="All"
-            value={pendingSelections.numberOfProgresses}
+            value={pending.numberOfProgresses}
             onChange={(values) => handlePendingChange('numberOfProgresses', values as number[])}
             showSearch
-            options={NUMBER_OF_PROGRESSES_OPTIONS.map(num => ({
-              value: num,
-              label: `${num} session${num > 1 ? 's' : ''}`,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'numberOfProgresses')}
+            options={numberOfProgressesOptions}
+            popupRender={(menu) => renderDropdown(menu, 'numberOfProgresses')}
           />
         </div>
 
@@ -397,17 +391,50 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             mode="multiple"
             style={{ width: '100%' }}
             placeholder="All"
-            value={pendingSelections.numberOfProgressPerWeeks}
+            value={pending.numberOfProgressPerWeeks}
             onChange={(values) => handlePendingChange('numberOfProgressPerWeeks', values as number[])}
             showSearch
-            options={SESSIONS_PER_WEEK_OPTIONS.map(num => ({
-              value: num,
-              label: `${num} per week`,
-            }))}
-            dropdownRender={(menu) => renderMultiSelectDropdown(menu, 'numberOfProgressPerWeeks')}
+            options={sessionsPerWeekOptions}
+            popupRender={(menu) => renderDropdown(menu, 'numberOfProgressPerWeeks')}
           />
         </div>
-      </Space>
+
+        {/* Languages */}
+        <div>
+          <Text strong>Languages</Text>
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            placeholder="All"
+            value={pending.langCodes}
+            onChange={(values) => handlePendingChange('langCodes', values)}
+            showSearch
+            filterOption={(input, option) =>
+              (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={languageOptions}
+            popupRender={(menu) => renderDropdown(menu, 'langCodes')}
+          />
+        </div>
+
+        {/* Locations */}
+        <div>
+          <Text strong>Locations</Text>
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            placeholder="All"
+            value={pending.locationCodes}
+            onChange={(values) => handlePendingChange('locationCodes', values)}
+            showSearch
+            filterOption={(input, option) =>
+              (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={locationOptions}
+            popupRender={(menu) => renderDropdown(menu, 'locationCodes')}
+          />
+        </div>
+      </div>
     </Card>
   );
 };

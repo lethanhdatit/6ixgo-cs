@@ -1,6 +1,33 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { getConfig, getTimezoneOffset } from '../config/env';
 import { DEFAULT_LOCALE_CODE } from '../constants';
+import { StoredAuthSession } from '../types';
+
+// In-memory access token cache to avoid repeated localStorage reads
+let accessToken: string | null = null;
+
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
+};
+
+const getAccessToken = (): string | null => {
+  // Prefer in-memory token
+  if (accessToken) return accessToken;
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const stored = localStorage.getItem('6ixgo_auth');
+    if (!stored) return null;
+    const parsed: StoredAuthSession = JSON.parse(stored);
+    return parsed.accessToken || null;
+  } catch (error) {
+    console.error('Failed to read access token from storage', error);
+    return null;
+  }
+};
 
 // API Error response format from backend
 export interface ApiErrorDetail {
@@ -72,12 +99,17 @@ const createApiInstance = (getBaseUrl: () => string): AxiosInstance => {
       
       // Add common headers
       const envConfig = getConfig();
-      console.log('envConfig:', envConfig);
       config.headers['X-Locale-Code'] = DEFAULT_LOCALE_CODE;
       config.headers['X-TimeZone-Offset'] = getTimezoneOffset().toString();
       config.headers['Content-Type'] = 'application/json';
       // Origin header for CORS - mapped to environment
       config.headers['X-Origin'] = envConfig.originUrl;
+
+      // Bearer token for authenticated requests
+      const token = getAccessToken();
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
       
       return config;
     },
