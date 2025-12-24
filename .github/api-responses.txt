@@ -1,0 +1,420 @@
+API get resources response đoạn mẫu:
+{
+  "message": "OK",
+  "data": {
+    "categories": [
+      {
+        "type": "GNB",
+        "gnbDisplayOrder": 0,
+        "children": [
+          {
+            "type": "GNB",
+            "imageUrl": "",
+            "imageMoUrl": "",
+            "gnbDisplayOrder": 0,
+            "children": [
+              {
+                "type": "GNB",
+                "imageUrl": "https://img.6ixgo.com/categoryimageresource/ctg11000000001.svg",
+                "gnbDisplayOrder": 0,
+                "children": [
+                  {
+                    "type": "GNB",
+                    "imageUrl": "https://img.6ixgo.com/categoryimageresource/ctg11100000001.svg?ver=a8ec74a6-16d9-4cef-b711-6f4b68bb78da",
+                    "imageMoUrl": "https://img.6ixgo.com/categoryimageresource/ctg11100000001mo.svg?ver=414755e8-28ff-4a93-91be-d8763956111c",
+                    "gnbDisplayOrder": 0,
+                    "children": [],
+                    "id": "96025791-208d-4c9b-9c35-df44fce23b87",
+                    "level": 0,
+                    "code": "CTG11100000001",
+                    "name": "Vietnamese",
+                    "description": "tiếng việt,việt,việt nam,việt ngữ,vn\r\n|\r\nvietnamese,vietnam,vnm,vn\r\n|\r\n베트남어,베트남",
+                    "displayOrder": 0,
+                    "localizedCode": "ENG",
+                    "localizedName": "Vietnamese"
+                  }
+                ],
+                "id": "ba9202e4-b1f1-4360-873c-24f46cdbbf0b",
+                "level": 0,
+                "code": "CTG11000000001",
+                "name": "Language",
+                "description": "gia sư, dạy kèm\r\n|\r\ntutoring,tutor\r\n|\r\n과외,과외 선생님,수업",
+                "displayOrder": 0,
+                "localizedCode": "ENG",
+                "localizedName": "Language"
+              }
+            ],
+            "id": "fd9fd023-78b2-4d41-a81d-eb563f4aeb03",
+            "level": 0,
+            "code": "CTG10000000001",
+            "name": "Classes",
+            "displayOrder": 0,
+            "localizedCode": "ENG",
+            "localizedName": "Classes"
+          }
+        ],
+        "id": "cd22af5f-d822-4395-bd11-6e7335a6b27b",
+        "level": 0,
+        "code": "CTG00000000001",
+        "name": "Buying and Selling",
+        "displayOrder": 0,
+        "localizedCode": "ENG",
+        "localizedName": "Buying and Selling"
+      }
+    ],
+    "languages": [
+      {
+        "children": [],
+        "id": "69fd20ae-f22a-4bec-bdad-7f651ceb12e7",
+        "level": 1,
+        "code": "ENG",
+        "name": "English",
+        "displayOrder": 16,
+        "localizedCode": "ENG",
+        "localizedName": "English"
+      }
+    ],
+    "locations": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [],
+                "id": "d8ddb0c0-ea60-499a-8756-6ce183d24d19",
+                "level": 3,
+                "code": "THUDUC",
+                "name": "Thu Duc",
+                "displayOrder": 0,
+                "localizedCode": "ENG",
+                "localizedName": "Thu Duc"
+              },
+              {
+                "children": [],
+                "id": "0a7fa5ae-b7b8-4ff3-88b6-8edd75bfd42a",
+                "level": 3,
+                "code": "DISTRICT1",
+                "name": "District 1",
+                "displayOrder": 1,
+                "localizedCode": "ENG",
+                "localizedName": "District 1"
+              }
+            ],
+            "id": "f01bca71-53b1-4f89-a6c8-e9eb76cfc94b",
+            "level": 2,
+            "code": "HOCHIMINH",
+            "metaValue": "1",
+            "name": "Ho Chi Minh",
+            "displayOrder": 0,
+            "localizedCode": "ENG",
+            "localizedName": "Ho Chi Minh"
+          }
+        ],
+        "id": "fe3db623-8f36-40a3-a60c-aa450c5ebfdc",
+        "level": 1,
+        "code": "VNM",
+        "name": "Viet Nam",
+        "ext": "+84",
+        "description": "https://img.6ixgo.com/staticfixedcountryflag/vnm.svg?ver=74790281-9265-4fd0-be4e-718d95d2fe84",
+        "displayOrder": 173,
+        "localizedCode": "ENG",
+        "localizedName": "Viet Nam",
+        "localizedDescription": "https://img.6ixgo.com/staticfixedcountryflag/vnm.svg?ver=74790281-9265-4fd0-be4e-718d95d2fe84"
+      },
+      {
+        "children": [],
+        "id": "8c74204b-696d-4939-a80c-d8632a753208",
+        "level": 1,
+        "code": "KOR",
+        "name": "South Korea",
+        "ext": "+82",
+        "description": "https://img.6ixgo.com/staticfixedcountryflag/kor.svg?ver=abcce1f5-fd60-4a26-862f-c12c632d71b9",
+        "displayOrder": 157,
+        "localizedCode": "ENG",
+        "localizedName": "South Korea",
+        "localizedDescription": "https://img.6ixgo.com/staticfixedcountryflag/kor.svg?ver=abcce1f5-fd60-4a26-862f-c12c632d71b9"
+      }
+    ],
+    "productTypes": {
+      "CTG10000000001": [
+        {
+          "children": [],
+          "id": "ed6ba068-0d75-488e-8bfe-bff8a2d5efbe",
+          "level": 1,
+          "code": "PRCTG110000001",
+          "metaValue": "true",
+          "name": "One Day Class",
+          "displayOrder": 0,
+          "localizedCode": "ENG",
+          "localizedName": "One Day Class"
+        },
+        {
+          "children": [],
+          "id": "2ce0577e-21ae-4ff7-9820-8c4e9fe6c8e1",
+          "level": 1,
+          "code": "PRCTG110000002",
+          "metaValue": "false",
+          "name": "Project Class",
+          "displayOrder": 1,
+          "localizedCode": "ENG",
+          "localizedName": "Project Class"
+        }
+      ],
+      "CTG10000000002": [
+        {
+          "children": [],
+          "id": "384503e2-5e29-46c4-8e8d-4806703d879a",
+          "level": 1,
+          "code": "PRCTG120000001",
+          "metaValue": "true",
+          "name": "One Day Service",
+          "displayOrder": 0,
+          "localizedCode": "ENG",
+          "localizedName": "One Day Service"
+        },
+        {
+          "children": [],
+          "id": "73be147a-7b2c-422a-abf5-ec109568e368",
+          "level": 1,
+          "code": "PRCTG120000002",
+          "metaValue": "false",
+          "name": "Project Service",
+          "displayOrder": 1,
+          "localizedCode": "ENG",
+          "localizedName": "Project Service"
+        }
+      ]
+    },
+    "processMethods": {
+      "CTG10000000001": [
+        {
+          "children": [],
+          "id": "7782b99c-10e7-4019-b921-f004298775d0",
+          "level": 1,
+          "code": "PMCTG110000001",
+          "metaValue": "true",
+          "name": "1:1 Lessons",
+          "displayOrder": 0,
+          "localizedCode": "ENG",
+          "localizedName": "1:1 Lessons"
+        },
+        {
+          "children": [],
+          "id": "370ebbc5-4b6a-4192-97a3-55886ef48213",
+          "level": 1,
+          "code": "PMCTG110000002",
+          "metaValue": "false",
+          "name": "Group lessons",
+          "displayOrder": 1,
+          "localizedCode": "ENG",
+          "localizedName": "Group lessons"
+        },
+        {
+          "children": [],
+          "id": "ae6a8b00-854d-4e00-aab0-43024fef6731",
+          "level": 1,
+          "code": "PMCTG110000003",
+          "metaValue": "true",
+          "name": "Online",
+          "displayOrder": 2,
+          "localizedCode": "ENG",
+          "localizedName": "Online"
+        }
+      ],
+      "CTG10000000002": [
+        {
+          "children": [],
+          "id": "bda0a6e7-9e74-4929-8ffd-5a4ee5d4b3cc",
+          "level": 1,
+          "code": "PMCTG120000001",
+          "metaValue": "true",
+          "name": "Offline",
+          "displayOrder": 0,
+          "localizedCode": "ENG",
+          "localizedName": "Offline"
+        },
+        {
+          "children": [],
+          "id": "f1753d17-9b44-4791-9841-919f6d2344df",
+          "level": 1,
+          "code": "PMCTG120000002",
+          "metaValue": "true",
+          "name": "Online",
+          "displayOrder": 1,
+          "localizedCode": "ENG",
+          "localizedName": "Online"
+        }
+      ]
+    }
+  },
+  "ts": "12/24/2025 3:16:44 AM"
+}
+
+
+
+API filter response đoạn mẫu:
+{
+    "message": "OK",
+    "data": {
+        "pageNumber": 1,
+        "pageSize": 1,
+        "totalRecords": 129,
+        "totalPages": 129,
+        "items": [
+            {
+                "productId": "affc34a4-b232-46a5-999d-a25a5d02b7c6",
+                "autoId": 767,
+                "b2cLink": "https://6ixgo.com/rainy-art---relaxing-painting-class-for-beginners.ci767",
+                "type": "inquiryAndBooking",
+                "categoryName": "Hobby",
+                "subCategoryName": "Art & Craft",
+                "imageUrl": "https://img.6ixgo.com/entityurl/b32b8c7c-c482-4555-8d22-1ea57eeec6e3.webp",
+                "name": "RAINY ART - RELAXING PAINTING CLASS FOR BEGINNERS",
+				"csImportantNote": "any note 1",
+                "csSpecialPoint": "any note 2"
+                "productNames": [
+                    {
+                        "lang": "vie",
+                        "displayOrder": 0,
+                        "content": "RAINY ART - LỚP VẼ TRANH THƯ GIÃN DÀNH CHO NGƯỜI MỚI BẮT ĐẦU"
+                    },
+                    {
+                        "lang": "eng",
+                        "displayOrder": 1,
+                        "content": "RAINY ART - RELAXING PAINTING CLASS FOR BEGINNERS"
+                    },
+                    {
+                        "lang": "kor",
+                        "displayOrder": 2,
+                        "content": "RAINY ART – 초보자를 위한 힐링 아크릴 페인팅 클래스"
+                    }
+                ],
+                "productTypeName": "One Day Class",
+                "price": 490000,
+                "languages": [
+                    {
+                        "code": "ENG",
+                        "name": "English"
+                    },
+                    {
+                        "code": "VIE",
+                        "name": "Vietnamese"
+                    }
+                ],
+                "currency": "VND",
+                "status": {
+                    "code": "PDS00000000005",
+                    "text": "On Sale"
+                },
+                "sellerName": "Rainy_Art",
+                "avatarUrl": "https://img.6ixgo.com/entityurl/3dd9084f-f37e-4f10-9583-1cef6ea5c113.webp",
+                "createdTS": "2025-12-19T09:21:08.771579+07:00",
+                "lastUpdatedTS": "2025-12-19T12:02:13.853789+07:00",
+                "variants": [
+                    {
+                        "id": "9b048d0e-25fa-49e0-ab4e-b852a3cc681e",
+                        "displayOrder": 0,
+                        "names": [
+                            {
+                                "lang": "vie",
+                                "displayOrder": 0,
+                                "content": "VẼ TRANH ACRYLIC HOẶC TẠO NỔI (KÍCH THƯỚC TRANH 30X40cm)"
+                            },
+                            {
+                                "lang": "eng",
+                                "displayOrder": 1,
+                                "content": "ACRYLIC PAINTING OR RELIEF (PAINTING SIZE 30X40cm)"
+                            },
+                            {
+                                "lang": "kor",
+                                "displayOrder": 2,
+                                "content": "아크릴 / 입체 페인팅 클래스 (캔버스 30×40cm)"
+                            }
+                        ],
+						"csImportantNote": "any note 3",
+                        "csSpecialPoint": "any note 4"
+                        "progressMethodName": "Group lessons",
+                        "numberOfProgressesName": "1 session",
+                        "numberOfProgressesPerWeekName": "One Session",
+                        "progressTimeName": "03 hours",
+                        "districtName": "District 1",
+                        "cityName": "Ho Chi Minh",
+                        "originalPrice": 550000,
+                        "price": 550000,
+                        "currency": "VND",
+                        "eventInUse": false,
+                        "eventLimit": 0,
+                        "eventBookedCount": 0
+                    },
+                    {
+                        "id": "d341eacd-4119-47dc-94b4-f01dc4cf1444",
+                        "displayOrder": 1,
+                        "names": [
+                            {
+                                "lang": "vie",
+                                "displayOrder": 0,
+                                "content": "VẼ TRANH ACRYLIC HOẶC TẠO NỔI (KÍCH THƯỚC TRANH 20X30cm)"
+                            },
+                            {
+                                "lang": "eng",
+                                "displayOrder": 1,
+                                "content": "ACRYLIC PAINTING OR RELIEF (PAINTING SIZE 20X30cm)"
+                            },
+                            {
+                                "lang": "kor",
+                                "displayOrder": 2,
+                                "content": "아크릴 / 입체 페인팅 클래스 (캔버스 20×30cm)"
+                            }
+                        ],
+                        "progressMethodName": "Group lessons",
+                        "numberOfProgressesName": "1 session",
+                        "numberOfProgressesPerWeekName": "One Session",
+                        "progressTimeName": "03 hours",
+                        "districtName": "District 1",
+                        "cityName": "Ho Chi Minh",
+                        "originalPrice": 490000,
+                        "price": 490000,
+                        "currency": "VND",
+                        "eventInUse": false,
+                        "eventLimit": 0,
+                        "eventBookedCount": 0
+                    },
+                    {
+                        "id": "ae09d5f8-9c7b-4c6c-b343-8b27d986be42",
+                        "displayOrder": 2,
+                        "names": [
+                            {
+                                "lang": "vie",
+                                "displayOrder": 0,
+                                "content": "VẼ TRANH CHÂN DUNG"
+                            },
+                            {
+                                "lang": "eng",
+                                "displayOrder": 1,
+                                "content": "PORTRAIT PAINTING"
+                            },
+                            {
+                                "lang": "kor",
+                                "displayOrder": 2,
+                                "content": "초상화 페인팅 클래스"
+                            }
+                        ],
+                        "progressMethodName": "Group lessons",
+                        "numberOfProgressesName": "1 session",
+                        "numberOfProgressesPerWeekName": "One Session",
+                        "progressTimeName": "03 hours",
+                        "districtName": "District 1",
+                        "cityName": "Ho Chi Minh",
+                        "originalPrice": 650000,
+                        "price": 650000,
+                        "currency": "VND",
+                        "eventInUse": false,
+                        "eventLimit": 0,
+                        "eventBookedCount": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "ts": "12/24/2025 3:43:01 AM"
+}
