@@ -132,9 +132,12 @@ const createApiInstance = (getBaseUrl: () => string): AxiosInstance => {
         // Unauthorized - redirect to login
         if (typeof window !== 'undefined') {
           localStorage.removeItem('6ixgo_auth');
+          // Detect basePath from current URL
+          const basePath = window.location.pathname.startsWith('/6ixgo-cs') ? '/6ixgo-cs' : '';
+          const loginPath = `${basePath}/login`;
           // Don't redirect if already on login page
-          if (!window.location.pathname.includes('/6ixgo-cs/login')) {
-            window.location.href = '/6ixgo-cs/login';
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = loginPath;
           }
         }
       }

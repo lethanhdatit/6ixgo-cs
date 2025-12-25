@@ -60,4 +60,36 @@ export const getEnvironmentName = (): string => {
   return isProduction() ? 'Production' : 'Staging';
 };
 
-export default { getConfig, isProduction, getEnvironmentName };
+/**
+ * Get the base path for routing.
+ * On GitHub Pages (production build), Next.js sets basePath to '/6ixgo-cs'
+ * which is automatically prepended to all routes by Next.js router.
+ * We don't need to manually add basePath when using router.push() or Link.
+ * 
+ * However, when checking pathname from usePathname(), the basePath IS included.
+ * So we need this utility to normalize path comparisons.
+ */
+export const getBasePath = (): string => {
+  // Check if we're on GitHub Pages by looking at the pathname
+  if (typeof window !== 'undefined') {
+    // On GitHub Pages, the basePath will be in the URL
+    if (window.location.pathname.startsWith('/6ixgo-cs')) {
+      return '/6ixgo-cs';
+    }
+  }
+  return '';
+};
+
+/**
+ * Normalize a path by removing basePath prefix for comparison.
+ * usePathname() returns path WITH basePath on GitHub Pages.
+ */
+export const normalizePath = (pathname: string): string => {
+  const basePath = getBasePath();
+  if (basePath && pathname.startsWith(basePath)) {
+    return pathname.slice(basePath.length) || '/';
+  }
+  return pathname;
+};
+
+export default { getConfig, isProduction, getEnvironmentName, getBasePath, normalizePath };

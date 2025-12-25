@@ -26,7 +26,8 @@ const AppHeader: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/6ixgo-cs/login');
+    // Next.js router automatically handles basePath
+    router.push('/login');
   };
 
   const menuItems: MenuProps['items'] = [

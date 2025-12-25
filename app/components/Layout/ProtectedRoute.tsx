@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Spin } from 'antd';
 import { useAuth } from '../../hooks';
+import { normalizePath } from '../../config/env';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,11 +15,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Normalize pathname to remove basePath for comparison
+  const normalizedPath = normalizePath(pathname);
+  const isLoginPage = normalizedPath === '/login' || normalizedPath === '/login/';
+
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && pathname !== '/6ixgo-cs/login') {
-      router.push('/6ixgo-cs/login');
+    if (!isLoading && !isAuthenticated && !isLoginPage) {
+      // Next.js router automatically handles basePath, so we just use '/login'
+      router.push('/login');
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
+  }, [isAuthenticated, isLoading, isLoginPage, router]);
 
   if (isLoading) {
     return (
@@ -35,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated && pathname !== '/6ixgo-cs/login') {
+  if (!isAuthenticated && !isLoginPage) {
     return null;
   }
 
