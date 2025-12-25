@@ -18,7 +18,7 @@ const { Header } = Layout;
 const { Text } = Typography;
 
 const AppHeader: React.FC = () => {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, userName } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const envName = getEnvironmentName();
@@ -103,7 +103,7 @@ const AppHeader: React.FC = () => {
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <Space style={{ cursor: 'pointer' }}>
             <Avatar icon={<UserOutlined />} size="small" />
-            <Text className="header-user-name">Admin</Text>
+            <Text className="header-user-name">{userName || 'Admin'}</Text>
           </Space>
         </Dropdown>
       </Space>
